@@ -45,8 +45,8 @@ class NewVisitorTest(unittest.TestCase):
         # self.assertTrue(any(row.text == '1: Buy peacock feathers' for row in rows), "New to-do item did not appear in table")
         # self.assertIn('1:Buy peacock feathers', [row.text for row in rows])
         # time.sleep(1)  # selenium.common.exception.StaleElementReferenceException: Message: The element reference of <table id="id_list_table"> is stale.
-        WebDriverWait(self.browser, 10).until(expected_conditions.text_to_be_present_in_element((By.ID, 'id_list_table'), '1:Buy peacock feathers'))
-        self.check_for_row_in_list_table('1:Buy peacock feathers')
+        WebDriverWait(self.browser, 10).until(expected_conditions.text_to_be_present_in_element((By.ID, 'id_list_table'), '1: Buy peacock feathers'))
+        self.check_for_row_in_list_table('1: Buy peacock feathers')
 
         # 页面中又显示了一个文本框，可以输入其他的待办事项
         # 她输入了“Use peacock feathers to make a fly(”使用孔雀羽毛做假蝇)
@@ -61,8 +61,8 @@ class NewVisitorTest(unittest.TestCase):
         # self.assertIn('1:Buy peacock feathers', [row.text for row in rows])
         # self.assertIn('2:Use peacock feathers to make a fly', [row.text for row in rows])
         time.sleep(1)
-        self.check_for_row_in_list_table('1:Buy peacock feathers')
-        self.check_for_row_in_list_table('2:Use peacock feathers to make a fly')
+        self.check_for_row_in_list_table('1: Buy peacock feathers')
+        self.check_for_row_in_list_table('2: Use peacock feathers to make a fly')
         # 伊迪丝想知道这个网站是否会记住她的清单
         # 她看到网站为她生成了一个唯一的URL
         # 而且页面中有一些文字解说这个功能
