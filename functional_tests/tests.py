@@ -3,11 +3,14 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.ui import WebDriverWait
-import unittest
+from django.test import LiveServerTestCase
 import time
 
-class NewVisitorTest(unittest.TestCase):
 
+class NewVisitorTest(LiveServerTestCase):
+    """
+    从1.4版开始，Django提供了LiveServerTestCase类，它会自动创建一个测试数据库（跟单元测试一样），并启动一个开发服务器，让功能测试在其中运行
+    """
     def setUp(self):
         self.browser = webdriver.Firefox()
         self.browser.implicitly_wait(3)
@@ -23,7 +26,7 @@ class NewVisitorTest(unittest.TestCase):
     def test_can_start_a_list_and_retrieve_it_later(self):
         # 伊迪丝听说有一个很酷的在线待办事项应用
         # 她去看了这个应用的首页
-        self.browser.get('http://localhost:8000')
+        self.browser.get(self.live_server_url)
         # 她注意到网页的标题和头部都包含“To-Do”这个词
         self.assertIn('To-Do', self.browser.title)
         header_text = self.browser.find_element_by_tag_name('h1').text
@@ -70,7 +73,3 @@ class NewVisitorTest(unittest.TestCase):
 
         # 她访问那个URL，发现她的待办事项列表还在
         # 她很满意，去睡觉了
-
-
-if __name__ == '__main__':
-    unittest.main(warnings='ignore')
