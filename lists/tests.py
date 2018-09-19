@@ -77,6 +77,7 @@ class ListViewTest(TestCase):
         other_list = List.objects.create()
         correct_list = List.objects.create()
         response = self.client.get('/lists/%d/' % correct_list.id)
+        # response.context表示要传入render函数的上下文（self.client把上下文附在response对象上，方便测试）
         self.assertEqual(response.context['list'], correct_list)
 
 
