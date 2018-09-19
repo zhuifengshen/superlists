@@ -42,7 +42,7 @@ class NewVisitorTest(LiveServerTestCase):
         # 她按回车键后，被带到了一个新URL
         # 这个页面的待办事项清单中显示了“Buy peacock feathers”
         inputbox.send_keys(Keys.ENTER)
-        time.sleep(1)
+        time.sleep(1)  # 通过暂停，以便浏览器渲染页面
         edith_list_url = self.browser.current_url
         self.assertRegex(edith_list_url, '/lists/.+')
         # table = self.browser.find_element_by_id('id_list_table')  # 元素不存在，则抛出异常
@@ -66,7 +66,7 @@ class NewVisitorTest(LiveServerTestCase):
         # rows = table.find_elements_by_tag_name('tr')
         # self.assertIn('1:Buy peacock feathers', [row.text for row in rows])
         # self.assertIn('2:Use peacock feathers to make a fly', [row.text for row in rows])
-        time.sleep(3)
+        time.sleep(1)
         self.check_for_row_in_list_table('1: Buy peacock feathers')
         self.check_for_row_in_list_table('2: Use peacock feathers to make a fly')
         # 伊迪丝想知道这个网站是否会记住她的清单

@@ -6,13 +6,13 @@ from lists.views import home_page
 from lists.models import Item, List
 
 
-# Create your tests here.
 class HomePageTest(TestCase):
-
+    """主页测试"""
     def test_root_url_resolves_to_home_page_view(self):
         found = resolve('/')
         self.assertEqual(found.func, home_page)
 
+    # 表单form中包含了csrf_token随机值，导致这个用例测试不通过
     # def test_home_page_returns_correct_html(self):
     #     request = HttpRequest()
     #     response = home_page(request)
@@ -21,7 +21,7 @@ class HomePageTest(TestCase):
 
 
 class ListAndItemModelTest(TestCase):
-
+    """清单列表和清单项的模型测试"""
     def test_saving_and_retrieving_items(self):
         list_ = List()
         list_.save()
@@ -51,7 +51,7 @@ class ListAndItemModelTest(TestCase):
 
 
 class ListViewTest(TestCase):
-
+    """清单列表测试"""
     def test_uses_list_template(self):
         list_ = List.objects.create()
         response = self.client.get('/lists/%d/' % list_.id)
@@ -74,7 +74,6 @@ class ListViewTest(TestCase):
         self.assertNotContains(response, 'other list item 2')
 
     def test_passes_correct_list_to_template(self):
-        other_list = List.objects.create()
         correct_list = List.objects.create()
         response = self.client.get('/lists/%d/' % correct_list.id)
         # response.context表示要传入render函数的上下文（self.client把上下文附在response对象上，方便测试）
@@ -82,25 +81,14 @@ class ListViewTest(TestCase):
 
 
 class NewListTest(TestCase):
-
+    """新建一个清单列表测试"""
     def test_save_a_POST_request(self):
-        # request = HttpRequest()
-        # request.method = 'POST'
-        # request.POST['item_text'] = 'A new list item'
-        # response = home_page(request)
-
         self.client.post('/lists/new', data={'item_text': 'A new list item'})
-
         self.assertEqual(Item.objects.count(), 1)
         new_item = Item.objects.first()
         self.assertEqual(new_item.text, 'A new list item')
 
     def test_redirects_after_POST(self):
-        # request = HttpRequest()
-        # request.method = 'POST'
-        # request.POST['item_text'] = 'A new list item'
-        # response = home_page(request)
-
         response = self.client.post('/lists/new', data={'item_text': 'A new list item'})
         new_list = List.objects.first()
         self.assertEqual(response.status_code, 302)
@@ -109,22 +97,16 @@ class NewListTest(TestCase):
 
 
 class NewItemTest(TestCase):
-
+    """新建清单项测试"""
     def test_can_save_a_POST_request_to_an_existing_list(self):
-        other_list = List.objects.create()
         correct_list = List.objects.create()
-
         self.client.post('/lists/%d/add_item' % correct_list.id, data={'item_text': 'A new item for an existing list'})
-
         self.assertEqual(Item.objects.count(), 1)
         new_item = Item.objects.first()
         self.assertEqual(new_item.text, 'A new item for an existing list')
         self.assertEqual(new_item.list, correct_list)
 
     def test_redirects_to_list_view(self):
-        other_list = List.objects.create()
         correct_list = List.objects.create()
-
         response = self.client.post('/lists/%d/add_item' % correct_list.id, data={'item_text': 'A new item for an existing list'})
-
         self.assertRedirects(response, '/lists/%d/' % correct_list.id)

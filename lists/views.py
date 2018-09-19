@@ -1,17 +1,8 @@
 from django.shortcuts import render, redirect
 from lists.models import Item, List
-from django.http import HttpResponse
 
 
-# Create your views here.
 def home_page(request):
-    # if request.method == 'POST':
-    #     return HttpResponse(request.POST['item_text'])
-
-    # if request.method == 'POST':
-    #     Item.objects.create(text=request.POST['item_text'])
-    #     return redirect('/lists/the-only-list-in-the-world/')
-
     return render(request, 'home.html')
 
 
