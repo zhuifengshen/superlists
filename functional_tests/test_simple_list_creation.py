@@ -62,13 +62,12 @@ class NewVisitorTest(FunctionalTest):
         # 她很满意，去睡觉了
 
         # 现在一个叫费朗西斯的新用户访问了网站
-
-        ## 我们使用一个新浏览器会话
-        ## 确保伊迪丝的信息不会从cookie中泄露
+        # 我们使用一个新浏览器会话
+        # 确保伊迪丝的信息不会从cookie中泄露
         self.browser.quit()
-        self.browser = webdriver.Chrome()
 
         # 弗朗西斯访问首页
+        self.browser = webdriver.Chrome()
         # 页面中看不到伊迪丝的清单
         self.browser.get(self.server_url)
         page_text = self.browser.find_element_by_tag_name('body').text

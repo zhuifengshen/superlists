@@ -1,8 +1,6 @@
 from django.test import TestCase
 from django.utils.html import escape
 from django.urls import resolve, reverse
-from django.http import HttpRequest
-from django.template.loader import render_to_string
 from lists.views import home_page
 from lists.models import Item, List
 
@@ -13,12 +11,11 @@ class HomePageTest(TestCase):
         found = resolve('/')
         self.assertEqual(found.func, home_page)
 
-    # 表单form中包含了csrf_token随机值，导致这个用例测试不通过
-    # def test_home_page_returns_correct_html(self):
-    #     request = HttpRequest()
-    #     response = home_page(request)
-    #     expected_html = render_to_string('home.html')
-    #     self.assertEqual(response.content.decode(), expected_html)
+    def test_home_page_returns_correct_html(self):
+        url = reverse('home')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'home.html')
 
 
 class ListViewTest(TestCase):
