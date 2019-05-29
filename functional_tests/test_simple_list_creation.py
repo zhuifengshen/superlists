@@ -3,31 +3,15 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.ui import WebDriverWait
-# from django.test import LiveServerTestCase
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 import time
+from functional_tests.base import FunctionalTest
 
 
-class NewVisitorTest(StaticLiveServerTestCase):
-    """
-    从1.4版开始，Django提供了LiveServerTestCase类，它会自动创建一个测试数据库（跟单元测试一样），并启动一个开发服务器，让功能测试在其中运行
-    """
-    def setUp(self):
-        self.browser = webdriver.Chrome()
-        self.browser.implicitly_wait(3)
-
-    def tearDown(self):
-        self.browser.quit()
-
-    def check_for_row_in_list_table(self, row_text):
-        table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_tag_name('tr')
-        self.assertIn(row_text, [row.text for row in rows])
-
+class NewVisitorTest(FunctionalTest):
     def test_can_start_a_list_and_retrieve_it_later(self):
         # 伊迪丝听说有一个很酷的在线待办事项应用
         # 她去看了这个应用的首页
-        self.browser.get(self.live_server_url)
+        self.browser.get(self.server_url)
         # 她注意到网页的标题和头部都包含“To-Do”这个词
         self.assertIn('To-Do', self.browser.title)
         header_text = self.browser.find_element_by_tag_name('h1').text
@@ -86,7 +70,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
 
         # 弗朗西斯访问首页
         # 页面中看不到伊迪丝的清单
-        self.browser.get(self.live_server_url)
+        self.browser.get(self.server_url)
         page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn('Buy peacock feathers', page_text)
         self.assertNotIn('Use peacock feathers to make a fly', page_text)
@@ -109,19 +93,3 @@ class NewVisitorTest(StaticLiveServerTestCase):
         self.assertIn('Buy milk', page_text)
 
         # 两人都很满意，去睡觉了
-
-    def test_layout_and_styling(self):
-        # 伊迪丝访问首页
-        self.browser.get(self.live_server_url)
-        self.browser.set_window_size(1024, 768)
-
-        # 她看到输入框完美地居中显示
-        inputbox = self.browser.find_element_by_id('id_new_item')
-        self.assertAlmostEqual(inputbox.location['x'] + inputbox.size['width'] / 2, 512, delta=5)
-
-        # 她新建了一个清单，看到输入框仍完美地居中显示
-        inputbox.send_keys('testing')
-        inputbox.send_keys(Keys.ENTER)
-        WebDriverWait(self.browser, 10).until(expected_conditions.text_to_be_present_in_element((By.ID, 'id_list_table'), '1: testing'))
-        inputbox = self.browser.find_element_by_id('id_new_item')
-        self.assertAlmostEqual(inputbox.location['x'] + inputbox.size['width'] / 2, 512, delta=5)
