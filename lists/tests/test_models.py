@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from lists.models import Item, List
 
@@ -30,3 +31,17 @@ class ListAndItemModelTest(TestCase):
         self.assertEqual(first_saved_item.list, list_)
         self.assertEqual(second_saved_item.text, 'Item the second')
         self.assertEqual(second_saved_item.list, list_)
+
+    def test_cannot_save_empty_list_item(self):
+        list_ = List.objects.create()
+        item = Item(list=list_, text='')
+
+        with self.assertRaises(ValidationError):
+            item.save()
+            item.full_clean()  # 用于运行全部验证（历史原因，保存数据时Django模型不会运行全部验证，另外SQLite不支持文本字段上的强制空值约束）
+
+        # try:
+        #     item.save()
+        #     self.fail('The save should have raised an exception')
+        # except ValidationError:
+        #     pass
