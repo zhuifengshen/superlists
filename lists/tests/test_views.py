@@ -3,7 +3,7 @@ from django.template.loader import render_to_string
 from django.test import TestCase
 from django.utils.html import escape
 from django.urls import resolve, reverse
-from lists.forms import ItemForm, EMPTY_ITEM_ERROR
+from lists.forms import ItemForm, EMPTY_ITEM_ERROR, ExistingListItemForm
 from lists.views import home_page
 from lists.models import Item, List
 
@@ -35,10 +35,23 @@ class HomePageTest(TestCase):
 
 class ListViewTest(TestCase):
     """清单列表测试"""
+
     def test_uses_list_template(self):
         list_ = List.objects.create()
         response = self.client.get('/lists/%d/' % list_.id)
         self.assertTemplateUsed(response, 'list.html')
+
+    def test_passes_correct_list_to_template(self):
+        correct_list = List.objects.create()
+        response = self.client.get('/lists/%d/' % correct_list.id)
+        # response.context表示要传入render函数的上下文（self.client把上下文附在response对象上，方便测试）
+        self.assertEqual(response.context['list'], correct_list)
+
+    def test_displays_item_form(self):
+        list_ = List.objects.create()
+        response = self.client.get('/lists/%d/' % list_.id)
+        self.assertIsInstance(response.context['form'], ExistingListItemForm)
+        self.assertContains(response, 'name="text"')
 
     def test_displays_only_items_for_that_list(self):
         correct_list = List.objects.create()
@@ -55,12 +68,6 @@ class ListViewTest(TestCase):
         self.assertContains(response, 'itemey 2')
         self.assertNotContains(response, 'other list item 1')
         self.assertNotContains(response, 'other list item 2')
-
-    def test_passes_correct_list_to_template(self):
-        correct_list = List.objects.create()
-        response = self.client.get('/lists/%d/' % correct_list.id)
-        # response.context表示要传入render函数的上下文（self.client把上下文附在response对象上，方便测试）
-        self.assertEqual(response.context['list'], correct_list)
 
     def test_can_save_a_POST_request_to_an_existing_list(self):
         correct_list = List.objects.create()
@@ -106,11 +113,21 @@ class ListViewTest(TestCase):
 
     def test_for_invalid_input_passes_form_to_template(self):
         response = self.post_invalid_input()
-        self.assertIsInstance(response.context['form'], ItemForm)
+        self.assertIsInstance(response.context['form'], ExistingListItemForm)
 
     def test_for_invalid_input_show_error_on_page(self):
         response = self.post_invalid_input()
         self.assertContains(response, escape(EMPTY_ITEM_ERROR))
+
+    def test_duplicate_item_validation_errors_end_up_on_lists_page(self):
+        list1 = List.objects.create()
+        item1 = Item.objects.create(list=list1, text='textey')
+        response = self.client.post('/lists/%d/' % list1.id, data={'text': 'textey'})
+
+        expected_error = escape("You've already got this in your list")
+        self.assertContains(response, expected_error)
+        self.assertTemplateUsed(response, 'list.html')
+        self.assertEqual(Item.objects.all().count(), 1)
 
 
 class NewListTest(TestCase):
@@ -124,8 +141,6 @@ class NewListTest(TestCase):
     def test_redirects_after_POST(self):
         response = self.client.post('/lists/new', data={'text': 'A new list item'})
         new_list = List.objects.first()
-        self.assertEqual(response.status_code, 302)
-        # self.assertEqual(response['location'], '/lists/the-only-list-in-the-world/')
         self.assertRedirects(response, '/lists/%d/' % new_list.id)
 
     def test_for_invalid_input_renders_home_template(self):
