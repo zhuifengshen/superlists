@@ -9,9 +9,9 @@ class FunctionalTest(StaticLiveServerTestCase):
     从1.4版开始，Django提供了LiveServerTestCase类，它会自动创建一个测试数据库（跟单元测试一样），并启动一个开发服务器，让功能测试在其中运行
     python3 manage.py test functional_tests
     or
-    python3 manage.py test functional_tests \ --liveserver=my-super-lists.site
+    python3 manage.py test functional_tests \ --liveserver=tester.umlife.net
     or
-    python3 manage.py test functional_tests liveserver=my-super-lists.site
+    python3 manage.py test functional_tests liveserver=tester.umlife.net
 
     """
     @classmethod
